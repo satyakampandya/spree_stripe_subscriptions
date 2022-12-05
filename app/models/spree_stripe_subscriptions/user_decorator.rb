@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module StripeSubscriptions
+module SpreeStripeSubscriptions
   module UserDecorator
     def self.prepended(base)
       base.has_many :stripe_customers,
@@ -42,4 +42,4 @@ module StripeSubscriptions
   end
 end
 
-Spree::User.prepend StripeSubscriptions::UserDecorator if Spree::User.included_modules.exclude?(StripeSubscriptions::UserDecorator)
+Spree::User.prepend SpreeStripeSubscriptions::UserDecorator if Spree::User.included_modules.exclude?(SpreeStripeSubscriptions::UserDecorator)

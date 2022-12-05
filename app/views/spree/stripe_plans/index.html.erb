@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="row my-5">
+    <div class="col-12 text-center">
+      <h2><%= I18n.t('spree_stripe_subscriptions.plans') %></h2>
+    </div>
+  </div>
+  <hr/>
+  <div class="row my-5">
+    <% @stripe_plans.each do |plan| %>
+      <div class="col-sm-12 py-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title"><%= plan.name %></h5>
+            <p class="card-text">
+              <%= number_to_currency(plan.amount, precision: 2) %> /
+              <%= plan.interval_count %> <%= plan.interval.pluralize(plan.interval_count) %> <br/>
+              <%= plan.trial_period_days %> <%= 'day'.pluralize(plan.trial_period_days) %> trial
+            </p>
+            <% if spree_current_user %>
+              <% if (subscription = @user_subscriptions.find { |s| s.plan_id == plan.id }) %>
+                <% if subscription.cancel_at_period_end %>
+                  <div class="alert alert-primary" role="alert">
+                    Your subscription ends on <%= subscription.cancel_at %>
+                  </div>
+                <% else %>
+                  <%= button_link_to I18n.t('spree_stripe_subscriptions.unsubscribe'),
+                                     stripe_plan_stripe_subscription_url(plan, subscription),
+                                     method: :delete, class: 'btn btn-primary btn-danger',
+                                     confirm: "Do you want to unsubscribe ?" %>
+                <% end %>
+              <% else %>
+                <% unless spree_current_user.stripe_subscriptions.active.present? %>
+                  <%= button_link_to I18n.t('spree_stripe_subscriptions.subscribe'),
+                                     stripe_plan_stripe_subscriptions_url(plan),
+                                     method: :post,
+                                     class: 'btn btn-primary btn-default' %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+

@@ -1,0 +1,17 @@
+<% content_for :page_title do %>
+  <%= link_to I18n.t('spree_stripe_subscriptions.admin.stripe_subscriptions'), spree.admin_stripe_configurations_url %> /
+  <%= @stripe_configuration.name %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= button_link_to I18n.t('spree_stripe_subscriptions.admin.manage_plans'), admin_stripe_configuration_stripe_plans_url(@stripe_configuration), class: "btn-success" %>
+<% end if @stripe_configuration.preferred_keys_available? %>
+
+<%= render partial: 'spree/admin/shared/error_messages', locals: { target: @stripe_configuration } %>
+
+<%= form_for [:admin, @stripe_configuration] do |f| %>
+  <fieldset>
+    <%= render partial: 'form', locals: { f: f } %>
+    <%= render partial: 'spree/admin/shared/edit_resource_links' %>
+  </fieldset>
+<% end %>

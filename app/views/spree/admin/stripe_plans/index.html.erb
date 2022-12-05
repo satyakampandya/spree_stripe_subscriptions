@@ -1,0 +1,59 @@
+<% content_for :page_title do %>
+  <%= link_to I18n.t('spree_stripe_subscriptions.admin.stripe_configurations'), spree.admin_stripe_configurations_url %> /
+  <%= link_to @stripe_configuration.name, spree.edit_admin_stripe_configuration_url(@stripe_configuration) %> /
+  <%= I18n.t('spree_stripe_subscriptions.admin.stripe_plans') %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= button_link_to I18n.t('spree_stripe_subscriptions.admin.new_stripe_plan'), new_object_url, class: "btn-success", icon: 'add.svg' %>
+<% end if can? :create, Spree::StripePlan %>
+
+<% if @stripe_plans.any? %>
+  <div class="table-responsive">
+    <table class="table sortable" data-hook
+           data-sortable-link="<%= update_positions_admin_stripe_configuration_stripe_plans_url(@stripe_configuration) %>">
+      <thead>
+      <tr>
+        <th title="<%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.weightage_title') %>"><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.weightage') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.stripe_plan_id') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.name') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.currency') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.amount') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.interval') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.interval_count') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.trial_period_days') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_plans.active') %></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @stripe_plans.each do |stripe_plan| %>
+        <tr id="<%= spree_dom_id stripe_plan %>">
+          <td class="move-handle text-center">
+            <%= svg_icon name: "sort.svg", width: '18', height: '18' %>
+          </td>
+          <td><%= stripe_plan.stripe_plan_id %></td>
+          <td><%= stripe_plan.name %></td>
+          <td><%= stripe_plan.currency.upcase %></td>
+          <td><%= stripe_plan.amount %></td>
+          <td><%= stripe_plan.interval.capitalize %></td>
+          <td><%= stripe_plan.interval_count %></td>
+          <td><%= stripe_plan.trial_period_days %></td>
+          <td><%= active_badge(stripe_plan.active) %></td>
+          <td class="actions">
+            <span class="d-flex justify-content-end">
+              <%= link_to_with_icon('edit.svg', I18n.t('spree_stripe_subscriptions.admin.edit'), spree.edit_admin_stripe_configuration_stripe_plan_url(@stripe_configuration, stripe_plan), class: 'btn btn-primary btn-sm', no_text: true, data: { action: 'edit' }) if can? :edit, stripe_plan %>
+              <%= link_to_delete(stripe_plan, { url: spree.admin_stripe_configuration_stripe_plan_url(@stripe_configuration, stripe_plan), no_text: true }) if can? :delete, stripe_plan %>
+            </span>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= I18n.t('spree_stripe_subscriptions.admin.no_resource_found',
+               resource: I18n.t('spree_stripe_subscriptions.admin.stripe_plans')) %>,
+    <%= link_to(I18n.t('spree_stripe_subscriptions.admin.add_one'), new_object_url) if can? :create, Spree::StripePlan %>
+  </div>
+<% end %>

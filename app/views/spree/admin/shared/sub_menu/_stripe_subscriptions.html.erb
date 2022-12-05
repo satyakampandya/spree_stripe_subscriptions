@@ -1,0 +1,8 @@
+<ul id="sidebar-stripe-subscriptions" class="border-top bg-white collapse nav nav-pills nav-stacked">
+  <%= tab :stripe_configurations,
+          label: I18n.t('spree_stripe_subscriptions.admin.stripe_configurations'),
+          match_path: /\/dashboard\/stripe_configurations/ %>
+  <%= tab :stripe_customers, label: I18n.t('spree_stripe_subscriptions.admin.stripe_customers') %>
+  <%= tab :stripe_subscriptions, label: I18n.t('spree_stripe_subscriptions.admin.stripe_subscriptions') %>
+  <%= tab :stripe_subscription_events, label: I18n.t('spree_stripe_subscriptions.admin.stripe_subscription_events') %>
+</ul>

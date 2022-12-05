@@ -1,0 +1,36 @@
+<% content_for :page_title do %>
+  <%= I18n.t('spree_stripe_subscriptions.admin.stripe_customers') %>
+<% end %>
+
+<% if @stripe_customers.any? %>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+      <tr>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_customers.name') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_customers.email') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_customers.stripe_customer_id') %></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @stripe_customers.each do |stripe_customer| %>
+        <tr id="<%= spree_dom_id stripe_customer %>">
+          <td><%= stripe_customer.user.probable_name %></td>
+          <td><%= stripe_customer.user.email %></td>
+          <td><%= stripe_customer.stripe_customer_id %></td>
+          <td class="actions">
+            <span class="d-flex justify-content-end">
+              <%#= link_to_edit(stripe_customer, no_text: true) if can? :edit, stripe_customer %>
+              <%#= link_to_delete(stripe_customer, no_text: true) if can? :delete, stripe_customer %>
+            </span>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= I18n.t('spree_stripe_subscriptions.admin.no_resource_found', resource: I18n.t('spree_stripe_subscriptions.admin.stripe_customers')) %>
+  </div>
+<% end %>

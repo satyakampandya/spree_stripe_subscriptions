@@ -1,0 +1,66 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  spree_stripe_subscriptions:
+    admin:
+      stripe_configurations: Stripe Configurations
+      new_stripe_configuration: New Stripe Configuration
+      stripe_plans: Stripe Plans
+      new_stripe_plan: Stripe Plan
+      stripe_customers: Stripe Customers
+      stripe_subscriptions: Stripe Subscriptions
+      stripe_subscription_events: Stripe Subscription Events
+      manage_plans: Manage Plans
+      no_resource_found: No %{resource} found
+      add_one: Add one
+      edit: Edit
+    messages:
+      success:
+        successfully_subscribed:
+        successfully_unsubscribed: You have unsubscribed.
+      errors:
+        already_subscribed: You already have active subscription
+        stripe_configuration_doesnt_exist: Stripe configurations not found
+    models:
+      stripe_configuration:
+        name: Name
+        description: Description
+        active: Active
+        deleted_at: Deleted At
+      stripe_customers:
+        name: Name
+        email: Email
+        stripe_customer_id: Stripe Customer ID
+        deleted_at: Deleted At
+      stripe_plans:
+        name: Name
+        description: Description
+        currency: Currency
+        amount: Amount
+        interval: Interval
+        interval_count: Interval Count
+        trial_period_days: Trial Period Days
+        configuration_id: Configuration ID
+        stripe_plan_id: Stripe Plan ID
+        active: Active
+        deleted_at: Deleted At
+        weightage: Plan Weightage
+        weightage_title: Move plans to update weightage, it'll be helpful in setting up upgrades/downgrades
+      stripe_subscription_events:
+        event_id: Event ID
+        event_type: Event Type
+        stripe_subscription_id: Stripe Subscription ID
+      stripe_subscriptions:
+        stripe_subscription_id: Stripe Subscription ID
+        plan: Plan
+        user: User
+        customer: Customer
+        status: Status
+    plans: Plans
+    spree:
+      public_key: Public Key
+      secret_key: Secret Key
+      webhook_secret: Webhook Secret Key
+    subscribe: Subscribe
+    unsubscribe: Unsubscribe

@@ -1,0 +1,15 @@
+<% content_for :page_title do %>
+  <%= link_to I18n.t('spree_stripe_subscriptions.admin.stripe_configurations'), spree.admin_stripe_configurations_url %> /
+  <%= link_to @stripe_configuration.name, spree.edit_admin_stripe_configuration_url(@stripe_configuration) %> /
+  <%= link_to I18n.t('spree_stripe_subscriptions.admin.stripe_plans'), spree.admin_stripe_configuration_stripe_plans_url(@stripe_configuration) %> /
+  <%= @stripe_plan.name %>
+<% end %>
+
+<%= render partial: 'spree/admin/shared/error_messages', locals: { target: @stripe_plan } %>
+
+<%= form_for [:admin, @stripe_configuration, @stripe_plan] do |f| %>
+  <fieldset>
+    <%= render partial: 'form', locals: { f: f } %>
+    <%= render partial: 'spree/admin/shared/edit_resource_links' %>
+  </fieldset>
+<% end %>

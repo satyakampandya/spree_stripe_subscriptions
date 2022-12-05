@@ -1,0 +1,36 @@
+<% content_for :page_title do %>
+  <%= I18n.t('spree_stripe_subscriptions.admin.stripe_subscription_events') %>
+<% end %>
+
+<% if @stripe_subscription_events.any? %>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+      <tr>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscription_events.event_id') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscription_events.event_type') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscription_events.stripe_subscription_id') %></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @stripe_subscription_events.each do |stripe_subscription_event| %>
+        <tr id="<%= spree_dom_id stripe_subscription_event %>">
+          <td><%= stripe_subscription_event.event_id %></td>
+          <td><%= stripe_subscription_event.event_type %></td>
+          <td><%= stripe_subscription_event.subscription.stripe_subscription_id %></td>
+          <td class="actions">
+            <span class="d-flex justify-content-end">
+              <%#= link_to_edit(stripe_subscription_event, no_text: true) if can? :edit, stripe_subscription_event %>
+              <%#= link_to_delete(stripe_subscription_event, no_text: true) if can? :delete, stripe_subscription_event %>
+            </span>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= I18n.t('spree_stripe_subscriptions.admin.no_resource_found', resource: I18n.t('spree_stripe_subscriptions.admin.stripe_subscription_events')) %>
+  </div>
+<% end %>

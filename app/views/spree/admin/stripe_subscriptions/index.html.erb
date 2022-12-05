@@ -1,0 +1,40 @@
+<% content_for :page_title do %>
+  <%= I18n.t('spree_stripe_subscriptions.admin.stripe_subscriptions') %>
+<% end %>
+
+<% if @stripe_subscriptions.any? %>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+      <tr>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscriptions.stripe_subscription_id') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscriptions.plan') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscriptions.user') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscriptions.customer') %></th>
+        <th><%= I18n.t('spree_stripe_subscriptions.models.stripe_subscriptions.status') %></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @stripe_subscriptions.each do |stripe_subscription| %>
+        <tr id="<%= spree_dom_id stripe_subscription %>">
+          <td><%= stripe_subscription.stripe_subscription_id %></td>
+          <td><%= stripe_subscription.plan.name %></td>
+          <td><%= stripe_subscription.user.email %></td>
+          <td><%= stripe_subscription.customer.stripe_customer_id %></td>
+          <td><%= stripe_subscription.status.capitalize %></td>
+          <td class="actions">
+            <span class="d-flex justify-content-end">
+              <%#= link_to_edit(stripe_subscription, no_text: true) if can? :edit, stripe_subscription %>
+              <%#= link_to_delete(stripe_subscription, no_text: true) if can? :delete, stripe_subscription %>
+            </span>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= I18n.t('spree_stripe_subscriptions.admin.no_resource_found', resource: I18n.t('spree_stripe_subscriptions.admin.stripe_subscriptions')) %>
+  </div>
+<% end %>

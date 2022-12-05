@@ -1,0 +1,43 @@
+<div data-hook="admin_stripe_plans_fields">
+  <%= f.field_container :name, class: ['form-group'] do %>
+    <%= f.label :name, I18n.t('spree_stripe_subscriptions.models.stripe_plans.name') %>
+    <%= f.text_field :name, class: 'form-control' %>
+  <% end %>
+
+  <%= f.field_container :description, class: ['form-group'] do %>
+    <%= f.label :description, I18n.t('spree_stripe_subscriptions.models.stripe_plans.description') %><br>
+    <%= f.text_area :description, class: 'form-control' %>
+  <% end %>
+
+  <%= f.field_container :interval, class: ['form-group'] do %>
+    <%= f.label :interval, I18n.t('spree_stripe_subscriptions.models.stripe_plans.interval') %>
+    <%= f.select :interval, Spree::StripePlan::INTERVAL.collect { |k, v| [v, k] }, {}, { :disabled => @stripe_plan.persisted?, class: 'select2' } %>
+  <% end %>
+
+  <%= f.field_container :interval_count, class: ['form-group'] do %>
+    <%= f.label :interval_count, I18n.t('spree_stripe_subscriptions.models.stripe_plans.interval_count') %>
+    <%= f.select :interval_count, (1..11).collect { |i| [i, i] }, {}, { :disabled => @stripe_plan.persisted?, class: 'select2' } %>
+  <% end %>
+
+  <%= f.field_container :currency, class: ['form-group'] do %>
+    <%= f.label :currency, I18n.t('spree_stripe_subscriptions.models.stripe_plans.currency') %>
+    <%= f.select :currency, Spree::StripePlan::CURRENCY.collect { |k, v| [v, k] }, {}, { :disabled => @stripe_plan.persisted?, class: 'select2' } %>
+  <% end %>
+
+  <%= f.field_container :amount, class: ['form-group'] do %>
+    <%= f.label :amount, I18n.t('spree_stripe_subscriptions.models.stripe_plans.amount') %>
+    <%= f.text_field :amount, :class => 'form-control', :disabled => @stripe_plan.persisted? %>
+  <% end %>
+
+  <%= f.field_container :trial_period_days, class: ['form-group'] do %>
+    <%= f.label :trial_period_days, I18n.t('spree_stripe_subscriptions.models.stripe_plans.trial_period_days') %>
+    <%= f.text_field :trial_period_days, :class => 'form-control', :disabled => @stripe_plan.persisted? %>
+  <% end %>
+
+  <%= f.field_container :active, class: ['form-group'] do %>
+    <div class="custom-control custom-switch">
+      <%= f.check_box :active, class: 'custom-control-input' %>
+      <%= f.label :active, class: 'custom-control-label' %>
+    </div>
+  <% end %>
+</div>

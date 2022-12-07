@@ -29,8 +29,8 @@ module Spree
     end
 
     def destroy
-      @subscription.unsubscribe
-      flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_unsubscribed')
+      @subscription.cancel_renewal
+      flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_canceled_renewal')
       redirect_to stripe_plans_path
     end
 

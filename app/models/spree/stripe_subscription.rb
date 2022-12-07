@@ -26,7 +26,7 @@ module Spree
 
     scope :active, -> { where(status: 'active') }
 
-    def unsubscribe
+    def cancel_renewal
       Stripe::Subscription.update(
         stripe_subscription_id,
         { cancel_at_period_end: true }

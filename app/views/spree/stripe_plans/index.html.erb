@@ -23,7 +23,7 @@
                     Your subscription ends on <%= subscription.cancel_at %>
                   </div>
                 <% else %>
-                  <%= button_link_to I18n.t('spree_stripe_subscriptions.unsubscribe'),
+                  <%= button_link_to I18n.t('spree_stripe_subscriptions.cancel_renewal'),
                                      stripe_plan_stripe_subscription_url(plan, subscription),
                                      method: :delete, class: 'btn btn-primary btn-danger',
                                      confirm: "Do you want to unsubscribe ?" %>

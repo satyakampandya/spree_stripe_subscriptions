@@ -17,8 +17,9 @@ en:
       edit: Edit
     messages:
       success:
-        successfully_subscribed:
-        successfully_unsubscribed: You have unsubscribed.
+        successfully_subscribed: You have subscribed
+        successfully_unsubscribed: You have unsubscribed
+        successfully_canceled_renewal: You have canceled renewal
       errors:
         already_subscribed: You already have active subscription
         stripe_configuration_doesnt_exist: Stripe configurations not found
@@ -64,3 +65,4 @@ en:
       webhook_secret: Webhook Secret Key
     subscribe: Subscribe
     unsubscribe: Unsubscribe
+    cancel_renewal: Cancel Renewal

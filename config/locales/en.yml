@@ -17,10 +17,13 @@ en:
       edit: Edit
     messages:
       success:
-        successfully_subscribed: You have subscribed
-        successfully_unsubscribed: You have unsubscribed
-        successfully_canceled_renewal: You have canceled renewal
+        successfully_subscribed: Successfully subscribed
+        successfully_unsubscribed: Successfully unsubscribed
+        successfully_canceled_renewal: Successfully canceled renewal
+        successfully_upgraded: Successfully Upgraded
+        successfully_downgraded: Successfully Downgraded
       errors:
+        no_active_subscription: You don't have any active subscription
         already_subscribed: You already have active subscription
         stripe_configuration_doesnt_exist: Stripe configurations not found
     models:
@@ -66,3 +69,5 @@ en:
     subscribe: Subscribe
     unsubscribe: Unsubscribe
     cancel_renewal: Cancel Renewal
+    upgrade: Upgrade
+    downgrade: Downgrade

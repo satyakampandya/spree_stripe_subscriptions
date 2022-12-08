@@ -17,11 +17,7 @@ module Spree
     end
 
     def load_user_subscriptions
-      @user_subscriptions = if spree_current_user
-                              spree_current_user.stripe_subscriptions.active.all.to_a
-                            else
-                              []
-                            end
+      @active_subscription = spree_current_user.stripe_subscriptions.active.last
     end
   end
 end

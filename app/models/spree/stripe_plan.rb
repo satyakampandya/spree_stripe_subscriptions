@@ -70,26 +70,6 @@ module Spree
       stripe_plan.delete
     end
 
-    def create_or_update_subscription(event, customer)
-      event_data = event.data.object
-      stripe_subscription_id = event_data.id
-
-      subscription = stripe_subscriptions.where(stripe_subscription_id: stripe_subscription_id).first_or_initialize
-
-      subscription.update(
-        customer: customer, user: customer.user,
-        status: event_data.status,
-        current_period_start: event_data.current_period_start ? Time.at(event_data.current_period_start).utc.to_datetime : nil,
-        current_period_end: event_data.current_period_end ? Time.at(event_data.current_period_end).utc.to_datetime : nil,
-        billing_cycle_anchor: event_data.billing_cycle_anchor ? Time.at(event_data.billing_cycle_anchor).utc.to_datetime : nil,
-        cancel_at_period_end: event_data.cancel_at_period_end,
-        cancel_at: event_data.cancel_at ? Time.at(event_data.cancel_at).utc.to_datetime : nil,
-        canceled_at: event_data.canceled_at ? Time.at(event_data.canceled_at).utc.to_datetime : nil,
-        ended_at: event_data.ended_at ? Time.at(event_data.ended_at).utc.to_datetime : nil
-      )
-      subscription
-    end
-
     def stripe_amount(amount)
       (amount * 100).to_i
     end

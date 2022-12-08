@@ -20,7 +20,7 @@ module Spree
         customer = Spree::StripeCustomer.find_by!(stripe_customer_id: event.data.object.customer)
         plan = Spree::StripePlan.find_by!(stripe_plan_id: event.data.object.plan.id)
 
-        subscription = plan.create_or_update_subscription(event, customer)
+        subscription = Spree::StripeSubscription.create_or_update_subscription(event, customer, plan)
         subscription.register_webhook_event(event)
       else
         Rails.logger.warn "Unhandled event type: #{event&.type}"

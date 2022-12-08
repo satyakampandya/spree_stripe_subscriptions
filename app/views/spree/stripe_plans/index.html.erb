@@ -17,19 +17,41 @@
               <%= plan.trial_period_days %> <%= 'day'.pluralize(plan.trial_period_days) %> trial
             </p>
             <% if spree_current_user %>
-              <% if (subscription = @user_subscriptions.find { |s| s.plan_id == plan.id }) %>
-                <% if subscription.cancel_at_period_end %>
-                  <div class="alert alert-primary" role="alert">
-                    Your subscription ends on <%= subscription.cancel_at %>
-                  </div>
+              <% if @active_subscription.present? && @active_subscription.plan_id == plan.id %>
+                <% if @active_subscription.cancel_at_period_end %>
+                  <p class="card-text">
+                    Your subscription ends on <%= @active_subscription.cancel_at %>
+                  </p>
                 <% else %>
                   <%= button_link_to I18n.t('spree_stripe_subscriptions.cancel_renewal'),
-                                     stripe_plan_stripe_subscription_url(plan, subscription),
-                                     method: :delete, class: 'btn btn-primary btn-danger',
-                                     confirm: "Do you want to unsubscribe ?" %>
+                                     stripe_plan_stripe_subscription_url(plan, @active_subscription),
+                                     method: :patch, class: 'btn btn-primary btn-danger',
+                                     confirm: "Do you want to cancel renewal?" %>
+                  <br/>
                 <% end %>
+                <%= button_link_to I18n.t('spree_stripe_subscriptions.unsubscribe'),
+                                   stripe_plan_stripe_subscription_url(plan, @active_subscription),
+                                   method: :delete, class: 'btn btn-primary btn-danger',
+                                   confirm: "Do you want to unsubscribe?" %>
               <% else %>
-                <% unless spree_current_user.stripe_subscriptions.active.present? %>
+                <% if @active_subscription.present? %>
+                  <%
+                    action_type = if @active_subscription.plan.weightage < plan.weightage
+                                    :upgrade
+                                  else
+                                    :downgrade
+                                  end
+                    action_url = if action_type == :upgrade
+                                   stripe_plan_stripe_subscriptions_url(plan)
+                                 else
+                                   downgrade_stripe_plan_stripe_subscription_url(plan, @active_subscription)
+                                 end
+                  %>
+                  <%= button_link_to I18n.t("spree_stripe_subscriptions.#{action_type}"),
+                                     action_url,
+                                     method: :post,
+                                     class: 'btn btn-primary btn-default' %>
+                <% else %>
                   <%= button_link_to I18n.t('spree_stripe_subscriptions.subscribe'),
                                      stripe_plan_stripe_subscriptions_url(plan),
                                      method: :post,

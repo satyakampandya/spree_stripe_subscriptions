@@ -26,10 +26,37 @@ module Spree
 
     scope :active, -> { where(status: 'active') }
 
+    def self.create_or_update_subscription(event, customer, plan)
+      event_data = event.data.object
+      stripe_subscription_id = event_data.id
+
+      subscription = Spree::StripeSubscription.where(stripe_subscription_id: stripe_subscription_id).first_or_initialize
+
+      subscription.update(
+        customer: customer, user: customer.user, plan: plan, status: event_data.status,
+        current_period_start: event_data.current_period_start ? Time.at(event_data.current_period_start).utc.to_datetime : nil,
+        current_period_end: event_data.current_period_end ? Time.at(event_data.current_period_end).utc.to_datetime : nil,
+        billing_cycle_anchor: event_data.billing_cycle_anchor ? Time.at(event_data.billing_cycle_anchor).utc.to_datetime : nil,
+        cancel_at_period_end: event_data.cancel_at_period_end,
+        cancel_at: event_data.cancel_at ? Time.at(event_data.cancel_at).utc.to_datetime : nil,
+        canceled_at: event_data.canceled_at ? Time.at(event_data.canceled_at).utc.to_datetime : nil,
+        ended_at: event_data.ended_at ? Time.at(event_data.ended_at).utc.to_datetime : nil
+      )
+      subscription
+    end
+
     def cancel_renewal
       Stripe::Subscription.update(
         stripe_subscription_id,
         { cancel_at_period_end: true }
+      )
+    rescue StandardError => e
+      Rails.logger.error e
+    end
+
+    def unsubscribe
+      Stripe::Subscription.delete(
+        stripe_subscription_id
       )
     rescue StandardError => e
       Rails.logger.error e

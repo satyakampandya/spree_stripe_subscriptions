@@ -14,7 +14,9 @@ Spree::Core::Engine.add_routes do
   end
 
   resources :stripe_plans, only: :index, path: SpreeStripeSubscriptions::Config.stripe_plans_path do
-    resources :stripe_subscriptions, only: %i[create destroy]
+    resources :stripe_subscriptions, only: %i[create update destroy] do
+      post :downgrade, on: :member
+    end
   end
 
   resources :stripe_webhooks, only: :none, path: SpreeStripeSubscriptions::Config.stripe_webhooks_path do

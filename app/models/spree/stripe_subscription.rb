@@ -12,6 +12,11 @@ module Spree
              foreign_key: :subscription_id,
              inverse_of: :subscription,
              dependent: :restrict_with_error
+    has_many :stripe_invoices,
+             class_name: 'Spree::StripeInvoice',
+             foreign_key: :subscription_id,
+             inverse_of: :subscription,
+             dependent: :restrict_with_error
 
     STATUS_OPTIONS = {
       'incomplete' => 'Incomplete',
@@ -27,8 +32,11 @@ module Spree
 
     scope :active, -> { where(status: 'active') }
 
-    def self.create_or_update_subscription(event, customer, plan)
+    def self.create_or_update_subscription(event)
       event_data = event.data.object
+      customer = Spree::StripeCustomer.find_by!(stripe_customer_id: event_data.customer)
+      plan = Spree::StripePlan.find_by!(stripe_plan_id: event_data.plan.id)
+
       stripe_subscription_id = event_data.id
 
       webhook_subscription = Spree::StripeSubscription.where(stripe_subscription_id: stripe_subscription_id).first_or_initialize
@@ -73,6 +81,44 @@ module Spree
           end
         end
       end
+      webhook_subscription
+    end
+
+    def self.create_or_update_invoice(event)
+      event_data = event.data.object
+      stripe_subscription_id = event_data.subscription
+
+      webhook_subscription = Spree::StripeSubscription.find_by(stripe_subscription_id: stripe_subscription_id)
+
+      if webhook_subscription.present?
+        stripe_invoice_id = event_data.id
+        customer = Spree::StripeCustomer.find_by(stripe_customer_id: event_data.customer)
+        stripe_invoice = webhook_subscription.stripe_invoices.where(stripe_invoice_id: stripe_invoice_id).first_or_initialize
+
+        period_start, period_end = if (line = event_data.lines.first)
+                                     [line.period.start, line.period.end]
+                                   end
+
+        stripe_invoice.update(
+          customer: customer,
+          status: event_data.status,
+          paid: event_data.paid,
+          currency: event_data.currency,
+          amount_paid: event_data.amount_paid || 0.0,
+          subtotal: event_data.subtotal || 0.0,
+          subtotal_excluding_tax: event_data.subtotal_excluding_tax || 0.0,
+          tax: event_data.tax || 0.0,
+          total: event_data.total || 0.0,
+          total_excluding_tax: event_data.total_excluding_tax || 0.0,
+          customer_name: event_data.customer_name,
+          billing_reason: event_data.billing_reason,
+          invoice_pdf: event_data.invoice_pdf,
+          period_start: period_start ? Time.at(period_start).utc.to_datetime : nil,
+          period_end: period_end ? Time.at(period_end).utc.to_datetime : nil,
+          raw_data: event_data
+        )
+      end
+
       webhook_subscription
     end
 

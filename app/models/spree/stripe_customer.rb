@@ -9,6 +9,11 @@ module Spree
              foreign_key: :customer_id,
              inverse_of: :customer,
              dependent: :restrict_with_error
+    has_many :stripe_invoices,
+             class_name: 'Spree::StripeInvoice',
+             foreign_key: :customer_id,
+             inverse_of: :customer,
+             dependent: :restrict_with_error
 
     def stripe_customer
       stripe_customer = nil

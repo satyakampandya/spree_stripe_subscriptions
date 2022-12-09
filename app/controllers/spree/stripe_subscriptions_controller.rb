@@ -38,32 +38,36 @@ module Spree
       active_subscription = spree_current_user.stripe_subscriptions.active.find(params[:id])
       destination_plan = Spree::StripePlan.active.find(params[:stripe_plan_id])
 
-      subscription_schedule = Stripe::SubscriptionSchedule.create({
-                                                 from_subscription: active_subscription.stripe_subscription_id
-                                               })
-      Stripe::SubscriptionSchedule.update(
-        subscription_schedule.id,
-        {
-          phases: [
-            {
-              items: [
-                { price: active_subscription.plan.stripe_plan_id, quantity: 1 }
-              ],
-              start_date: active_subscription.current_period_start.to_i,
-              end_date: active_subscription.current_period_end.to_i
-            },
-            {
-              items: [
-                { price: destination_plan.stripe_plan_id, quantity: 1 }
-              ],
-              start_date: active_subscription.current_period_end.to_i,
-              # end_date: subscription.current_period_end.to_i + 1.month.to_i
-            }
-          ]
-        }
-      )
-      flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_downgraded')
-      redirect_to stripe_plans_path
+      subscription_schedule = active_subscription.stripe_subscription_schedule
+
+      if subscription_schedule.present?
+        Stripe::SubscriptionSchedule.update(
+          subscription_schedule.id,
+          {
+            phases: [
+              {
+                items: [
+                  { price: active_subscription.plan.stripe_plan_id, quantity: 1 }
+                ],
+                start_date: active_subscription.current_period_start.to_i,
+                end_date: active_subscription.current_period_end.to_i
+              },
+              {
+                items: [
+                  { price: destination_plan.stripe_plan_id, quantity: 1 }
+                ],
+                start_date: active_subscription.current_period_end.to_i,
+                # end_date: active_subscription.current_period_end.to_i + 1.month.to_i
+              }
+            ]
+          }
+        )
+        flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_downgraded')
+        redirect_to stripe_plans_path
+      else
+        flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.errors.cannot_process_request')
+        redirect_to stripe_plans_path
+      end
     end
 
     def destroy

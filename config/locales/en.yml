@@ -26,6 +26,7 @@ en:
         no_active_subscription: You don't have any active subscription
         already_subscribed: You already have active subscription
         stripe_configuration_doesnt_exist: Stripe configurations not found
+        cannot_process_request: Please contact us to proceed
     models:
       stripe_configuration:
         name: Name

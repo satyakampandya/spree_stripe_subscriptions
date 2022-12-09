@@ -22,6 +22,9 @@ module Spree
 
         subscription = Spree::StripeSubscription.create_or_update_subscription(event, customer, plan)
         subscription.register_webhook_event(event)
+      elsif event.present? && (%w[subscription_schedule.updated].include? event.type)
+        subscription = Spree::StripeSubscription.update_subscription_schedule(event)
+        subscription.register_webhook_event(event) if subscription.present?
       else
         Rails.logger.warn "Unhandled event type: #{event&.type}"
       end

@@ -18,6 +18,11 @@ module SpreeStripeSubscriptions
                     foreign_key: :user_id,
                     inverse_of: :user,
                     dependent: :restrict_with_error
+      base.has_many :stripe_invoices,
+                    class_name: 'Spree::StripeInvoifce',
+                    foreign_key: :user_id,
+                    inverse_of: :user,
+                    dependent: :restrict_with_error
     end
 
     def probable_name

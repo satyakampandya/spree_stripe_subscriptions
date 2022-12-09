@@ -13,6 +13,7 @@ module Spree
     validates :status, inclusion: { in: STATUS_OPTIONS.keys }
 
     belongs_to :customer, class_name: 'Spree::StripeCustomer'
+    belongs_to :user, class_name: Spree.user_class.to_s
     belongs_to :subscription, class_name: 'Spree::StripeSubscription'
   end
 end

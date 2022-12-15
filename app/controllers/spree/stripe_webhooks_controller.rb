@@ -22,7 +22,7 @@ module Spree
       elsif event.present? && (%w[subscription_schedule.updated].include? event.type)
         subscription = Spree::StripeSubscription.update_subscription_schedule(event)
         subscription.register_webhook_event(event) if subscription.present?
-      elsif event.present? && (%w[invoice.updated invoice.paid].include? event.type)
+      elsif event.present? && (%w[invoice.paid].include? event.type)
         subscription = Spree::StripeSubscription.create_or_update_invoice(event)
         subscription.register_webhook_event(event) if subscription.present?
       else

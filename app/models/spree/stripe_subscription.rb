@@ -101,6 +101,7 @@ module Spree
 
         stripe_invoice.update(
           customer: customer,
+          user: customer.user,
           status: event_data.status,
           paid: event_data.paid,
           currency: event_data.currency,

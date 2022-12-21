@@ -8,6 +8,15 @@ module Spree
     CURRENCY = { usd: 'USD', gbp: 'GBP', jpy: 'JPY', eur: 'EUR', aud: 'AUD', hkd: 'HKD', sek: 'SEK', nok: 'NOK', dkk: 'DKK', pen: 'PEN',
                  cad: 'CAD' }.freeze
 
+    TAX_BEHAVIOUR_OPTIONS = {
+      'inclusive' => 'inclusive',
+      'exclusive' => 'exclusive',
+      'unspecified' => 'unspecified'
+    }.freeze
+
+    validates :tax_behavior, inclusion: { in: TAX_BEHAVIOUR_OPTIONS.keys }
+    validates :configuration, presence: true
+
     belongs_to :configuration, class_name: 'Spree::StripeConfiguration'
 
     has_many :stripe_subscriptions,
@@ -19,7 +28,7 @@ module Spree
     before_validation :set_stripe_plan_id, on: :create
 
     after_create :create_plan
-    after_update :update_plan, if: :name_changed?
+    after_update :update_plan
     after_destroy :delete_plan
 
     after_initialize :set_api_key
@@ -37,6 +46,10 @@ module Spree
       stripe_plan
     end
 
+    def update_price_tax_behavior
+      Stripe::Price.update(stripe_plan_id, { tax_behavior: tax_behavior })
+    end
+
     def create_plan
       plan = Stripe::Plan.create(
         id: stripe_plan_id,
@@ -49,6 +62,9 @@ module Spree
         interval_count: interval_count,
         trial_period_days: trial_period_days
       )
+      if plan.present?
+        update_price_tax_behavior
+      end
     rescue StandardError
       plan = nil
     ensure
@@ -56,6 +72,9 @@ module Spree
     end
 
     def update_plan
+      update_price_tax_behavior if tax_behavior_previously_changed?
+      return unless name_previously_changed?
+
       stripe_plan = find_or_create_stripe_plan
       return unless stripe_plan
 

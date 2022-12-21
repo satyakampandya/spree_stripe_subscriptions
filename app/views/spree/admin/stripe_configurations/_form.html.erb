@@ -14,6 +14,25 @@
     <%= preference_fields(@stripe_configuration, f) %>
   </div>
 
+  <%= f.field_container :billing_address_collection, class: ['form-group'] do %>
+    <%= f.label :billing_address_collection, I18n.t('spree_stripe_subscriptions.models.stripe_configuration.billing_address_collection') %>
+    <%= f.select :billing_address_collection, Spree::StripeConfiguration::ADDRESS_COLLECTION_OPTIONS.collect { |k, v| [v, k] }, {}, { class: 'select2' } %>
+  <% end %>
+
+  <%= f.field_container :automatic_tax, class: ['checkbox'] do %>
+    <%= f.label :automatic_tax do %>
+      <%= f.check_box :automatic_tax %>
+      <%= I18n.t('spree_stripe_subscriptions.models.stripe_configuration.automatic_tax') %>
+    <% end %>
+  <% end %>
+
+  <%= f.field_container :tax_id_collection, class: ['checkbox'] do %>
+    <%= f.label :tax_id_collection do %>
+      <%= f.check_box :tax_id_collection %>
+      <%= I18n.t('spree_stripe_subscriptions.models.stripe_configuration.tax_id_collection') %>
+    <% end %>
+  <% end %>
+
   <%= f.field_container :active, class: ['checkbox'] do %>
     <%= f.label :active do %>
       <%= f.check_box :active %>

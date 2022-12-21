@@ -1,4 +1,6 @@
 <div data-hook="admin_stripe_plans_fields">
+  <%= f.hidden_field :configuration_id, value: @stripe_configuration.id %>
+
   <%= f.field_container :name, class: ['form-group'] do %>
     <%= f.label :name, I18n.t('spree_stripe_subscriptions.models.stripe_plans.name') %>
     <%= f.text_field :name, class: 'form-control' %>
@@ -32,6 +34,11 @@
   <%= f.field_container :trial_period_days, class: ['form-group'] do %>
     <%= f.label :trial_period_days, I18n.t('spree_stripe_subscriptions.models.stripe_plans.trial_period_days') %>
     <%= f.text_field :trial_period_days, :class => 'form-control', :disabled => @stripe_plan.persisted? %>
+  <% end %>
+
+  <%= f.field_container :tax_behavior, class: ['form-group'] do %>
+    <%= f.label :tax_behavior, I18n.t('spree_stripe_subscriptions.models.stripe_plans.tax_behavior') %>
+    <%= f.select :tax_behavior, Spree::StripePlan::TAX_BEHAVIOUR_OPTIONS.collect { |k, v| [v, k] }, {}, { class: 'select2' } %>
   <% end %>
 
   <%= f.field_container :active, class: ['form-group'] do %>

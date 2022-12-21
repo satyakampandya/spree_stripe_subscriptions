@@ -6,6 +6,13 @@ module Spree
     preference :public_key, :string
     preference :webhook_secret, :string
 
+    ADDRESS_COLLECTION_OPTIONS = {
+      'auto' => 'auto',
+      'required' => 'required'
+    }.freeze
+
+    validates :billing_address_collection, inclusion: { in: ADDRESS_COLLECTION_OPTIONS.keys }
+
     has_many :stripe_plans,
              class_name: 'Spree::StripePlan',
              foreign_key: :configuration_id,

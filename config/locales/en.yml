@@ -33,6 +33,9 @@ en:
         description: Description
         active: Active
         deleted_at: Deleted At
+        billing_address_collection: Billing Address Collection
+        automatic_tax: Automatic Tax
+        tax_id_collection: Tax ID Collection
       stripe_customers:
         name: Name
         email: Email
@@ -52,6 +55,7 @@ en:
         deleted_at: Deleted At
         weightage: Plan Weightage
         weightage_title: Move plans to update weightage, it'll be helpful in setting up upgrades/downgrades
+        tax_behavior: Tax Behavior
       stripe_subscription_events:
         event_id: Event ID
         event_type: Event Type

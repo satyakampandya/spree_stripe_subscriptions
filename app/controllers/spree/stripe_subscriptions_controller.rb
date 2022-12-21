@@ -2,6 +2,7 @@ module Spree
   class StripeSubscriptionsController < StoreController
     before_action :login_required
     before_action :load_stripe_plan
+    before_action :load_stripe_configuration
     before_action :ensure_stripe_plan_exist
     before_action :ensure_stripe_customer_exist
     before_action :load_stripe_subscription, only: [:update, :destroy]
@@ -11,6 +12,7 @@ module Spree
       checkout_session = Stripe::Checkout::Session.create(
         mode: 'subscription',
         customer: @stripe_customer.id,
+        customer_update: { address: 'auto', name: 'auto' },
         client_reference_id: spree_current_user.id,
         line_items: [
           {
@@ -18,6 +20,9 @@ module Spree
             'quantity': 1
           }
         ],
+        automatic_tax: { enabled: @configuration.automatic_tax },
+        tax_id_collection: { enabled: @configuration.tax_id_collection },
+        billing_address_collection: @configuration.billing_address_collection,
         success_url: stripe_plans_url,
         cancel_url: stripe_plans_url
       )
@@ -84,6 +89,10 @@ module Spree
 
     def load_stripe_plan
       @plan = Spree::StripePlan.active.find(params[:stripe_plan_id])
+    end
+
+    def load_stripe_configuration
+      @configuration = @plan.configuration
     end
 
     def ensure_active_subscription

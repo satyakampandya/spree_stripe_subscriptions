@@ -16,6 +16,8 @@ Spree::Core::Engine.add_routes do
   resources :stripe_plans, only: :index, path: SpreeStripeSubscriptions::Config.stripe_plans_path do
     resources :stripe_subscriptions, only: %i[create update destroy] do
       post :downgrade, on: :member
+      post :change_payment_details, on: :member
+      get :update_payment_details, on: :member
     end
   end
 

@@ -22,6 +22,7 @@ en:
         successfully_canceled_renewal: Successfully canceled renewal
         successfully_upgraded: Successfully Upgraded
         successfully_downgraded: Successfully Downgraded
+        successfully_updated: Successfully Updated
       errors:
         no_active_subscription: You don't have any active subscription
         already_subscribed: You already have active subscription
@@ -76,3 +77,4 @@ en:
     cancel_renewal: Cancel Renewal
     upgrade: Upgrade
     downgrade: Downgrade
+    update_payment_method: Update Payment Method

@@ -5,7 +5,7 @@ module Spree
     before_action :load_stripe_configuration
     before_action :ensure_stripe_plan_exist
     before_action :ensure_stripe_customer_exist
-    before_action :load_stripe_subscription, only: [:update, :destroy]
+    before_action :load_stripe_subscription, only: [:update, :destroy, :change_payment_details, :update_payment_details]
     before_action :ensure_active_subscription, only: :downgrade
 
     def create
@@ -35,7 +35,55 @@ module Spree
 
     def update
       @subscription.cancel_renewal
-      flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_canceled_renewal')
+      flash[:success] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_canceled_renewal')
+      redirect_to stripe_plans_path
+    end
+
+    def change_payment_details
+      checkout_session = Stripe::Checkout::Session.create(
+        payment_method_types: ['card'],
+        mode: 'setup',
+        customer: @stripe_customer.id,
+        setup_intent_data: {
+          metadata: {
+            subscription_id: @subscription.stripe_subscription_id
+          }
+        },
+        success_url: "#{update_payment_details_stripe_plan_stripe_subscription_url(@plan, @subscription)}?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url: stripe_plans_url
+      )
+      redirect_to checkout_session.url
+    rescue StandardError => e
+      Rails.logger.error e.message
+      flash[:error] = e.message
+      redirect_to stripe_plans_path
+    end
+
+    def update_payment_details
+      return unless (session_id = params[:session_id])
+
+      checkout_session = Stripe::Checkout::Session.retrieve(session_id)
+      setup_intent = Stripe::SetupIntent.retrieve(checkout_session.setup_intent)
+
+      # Set invoice_settings.default_payment_method on the Customer
+      Stripe::Customer.update(
+        @stripe_customer.id,
+        { invoice_settings: { default_payment_method: setup_intent.payment_method } }
+      )
+
+      # Set default_payment_method on the Subscription
+      Stripe::Subscription.update(
+        @subscription.stripe_subscription_id,
+        {
+          default_payment_method: setup_intent.payment_method
+        }
+      )
+
+      flash[:success] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_updated')
+      redirect_to stripe_plans_path
+    rescue StandardError => e
+      Rails.logger.error e.message
+      flash[:error] = e.message
       redirect_to stripe_plans_path
     end
 
@@ -67,7 +115,7 @@ module Spree
             ]
           }
         )
-        flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_downgraded')
+        flash[:success] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_downgraded')
         redirect_to stripe_plans_path
       else
         flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.errors.cannot_process_request')
@@ -77,7 +125,7 @@ module Spree
 
     def destroy
       @subscription.unsubscribe
-      flash[:alert] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_unsubscribed')
+      flash[:success] = I18n.t('spree_stripe_subscriptions.messages.success.successfully_unsubscribed')
       redirect_to stripe_plans_path
     end
 

@@ -33,6 +33,10 @@
                                    stripe_plan_stripe_subscription_url(plan, @active_subscription),
                                    method: :delete, class: 'btn btn-primary btn-danger',
                                    confirm: "Do you want to unsubscribe?" %>
+                <br/>
+                <%= button_link_to I18n.t('spree_stripe_subscriptions.update_payment_method'),
+                                   change_payment_details_stripe_plan_stripe_subscription_url(plan, @active_subscription),
+                                   method: :post, class: 'btn btn-primary btn-danger' %>
               <% elsif @active_subscription.present? && @active_subscription.next_plan_id == plan.id %>
                 <p class="card-text">
                   Your next subscription starts on <%= @active_subscription.current_period_end %>

@@ -34,29 +34,42 @@ module Spree
 
     def self.create_or_update_subscription(event)
       event_data = event.data.object
-      customer = Spree::StripeCustomer.find_by!(stripe_customer_id: event_data.customer)
-      plan = Spree::StripePlan.find_by!(stripe_plan_id: event_data.plan.id)
 
-      stripe_subscription_id = event_data.id
+      subscription_event = %w[customer.subscription.updated customer.subscription.deleted].include?(event.type)
+      invoice_event = (event.type == 'invoice.paid')
+      schedule_event = (event.type == 'subscription_schedule.updated')
 
-      webhook_subscription = Spree::StripeSubscription.where(stripe_subscription_id: stripe_subscription_id).first_or_initialize
+      stripe_subscription_id = if invoice_event || schedule_event
+                                 event_data.subscription
+                               elsif subscription_event
+                                 event_data.id
+                               end
+
+      stripe_subscription = Stripe::Subscription.retrieve(stripe_subscription_id)
+
+      customer = Spree::StripeCustomer.find_by!(stripe_customer_id: stripe_subscription.customer)
+      plan = Spree::StripePlan.find_by!(stripe_plan_id: stripe_subscription.plan.id)
+
+      webhook_subscription = Spree::StripeSubscription.where(
+        stripe_subscription_id: stripe_subscription.id
+      ).first_or_initialize
 
       webhook_subscription.update(
-        customer: customer, user: customer.user, plan: plan, status: event_data.status,
-        current_period_start: event_data.current_period_start ? Time.at(event_data.current_period_start).utc.to_datetime : nil,
-        current_period_end: event_data.current_period_end ? Time.at(event_data.current_period_end).utc.to_datetime : nil,
-        billing_cycle_anchor: event_data.billing_cycle_anchor ? Time.at(event_data.billing_cycle_anchor).utc.to_datetime : nil,
-        cancel_at_period_end: event_data.cancel_at_period_end,
-        cancel_at: event_data.cancel_at ? Time.at(event_data.cancel_at).utc.to_datetime : nil,
-        canceled_at: event_data.canceled_at ? Time.at(event_data.canceled_at).utc.to_datetime : nil,
-        ended_at: event_data.ended_at ? Time.at(event_data.ended_at).utc.to_datetime : nil,
-        schedule: event_data.schedule
+        customer: customer, user: customer.user, plan: plan, status: stripe_subscription.status,
+        current_period_start: stripe_subscription.current_period_start ? Time.at(stripe_subscription.current_period_start).utc.to_datetime : nil,
+        current_period_end: stripe_subscription.current_period_end ? Time.at(stripe_subscription.current_period_end).utc.to_datetime : nil,
+        billing_cycle_anchor: stripe_subscription.billing_cycle_anchor ? Time.at(stripe_subscription.billing_cycle_anchor).utc.to_datetime : nil,
+        cancel_at_period_end: stripe_subscription.cancel_at_period_end,
+        cancel_at: stripe_subscription.cancel_at ? Time.at(stripe_subscription.cancel_at).utc.to_datetime : nil,
+        canceled_at: stripe_subscription.canceled_at ? Time.at(stripe_subscription.canceled_at).utc.to_datetime : nil,
+        ended_at: stripe_subscription.ended_at ? Time.at(stripe_subscription.ended_at).utc.to_datetime : nil,
+        schedule: stripe_subscription.schedule
       )
 
-      active_subscription = user.stripe_subscriptions.active.last
-      if active_subscription.present?
+      active_subscription = customer.user.stripe_subscriptions.active.last
+      if active_subscription.present? && subscription_event
         # Checking if customer upgraded to other plan
-        old_subscriptions = user.stripe_subscriptions.active.where.not(id: [active_subscription.id, webhook_subscription.id].uniq)
+        old_subscriptions = customer.user.stripe_subscriptions.active.where.not(id: [active_subscription.id, webhook_subscription.id].uniq)
         old_subscriptions.each do |old_subscription|
           # Unsubscribe from old subscription
           old_subscription.unsubscribe
@@ -89,6 +102,11 @@ module Spree
       stripe_subscription_id = event_data.subscription
 
       webhook_subscription = Spree::StripeSubscription.find_by(stripe_subscription_id: stripe_subscription_id)
+
+      unless webhook_subscription.present?
+        # If invoice.paid webhook is sent earlier than subscription.updated then subscription will be created
+        webhook_subscription = Spree::StripeSubscription.create_or_update_subscription(event)
+      end
 
       if webhook_subscription.present?
         stripe_invoice_id = event_data.id

@@ -19,6 +19,13 @@
     <%= f.select :billing_address_collection, Spree::StripeConfiguration::ADDRESS_COLLECTION_OPTIONS.collect { |k, v| [v, k] }, {}, { class: 'select2' } %>
   <% end %>
 
+  <%= f.field_container :allow_promotion_codes, class: ['checkbox'] do %>
+    <%= f.label :allow_promotion_codes do %>
+      <%= f.check_box :allow_promotion_codes %>
+      <%= I18n.t('spree_stripe_subscriptions.models.stripe_configuration.allow_promotion_codes') %>
+    <% end %>
+  <% end %>
+
   <%= f.field_container :automatic_tax, class: ['checkbox'] do %>
     <%= f.label :automatic_tax do %>
       <%= f.check_box :automatic_tax %>

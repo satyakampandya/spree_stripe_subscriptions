@@ -20,6 +20,7 @@ module Spree
             'quantity': 1
           }
         ],
+        allow_promotion_codes: @configuration.allow_promotion_codes,
         automatic_tax: { enabled: @configuration.automatic_tax },
         tax_id_collection: { enabled: @configuration.tax_id_collection },
         billing_address_collection: @configuration.billing_address_collection,

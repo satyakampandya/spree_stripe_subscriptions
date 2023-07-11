@@ -35,6 +35,7 @@ en:
         active: Active
         deleted_at: Deleted At
         billing_address_collection: Billing Address Collection
+        allow_promotion_codes: Allow Promotion Codes
         automatic_tax: Automatic Tax
         tax_id_collection: Tax ID Collection
       stripe_customers:
